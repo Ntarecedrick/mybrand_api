@@ -36,6 +36,7 @@ test('should get blog likes', async () => {
 //     expect(blogs.statusCode).toBe(200)
 // })
 
+
 test('should get a single blog', async () => {
     const blog = await Blog.findOne();
 
@@ -84,6 +85,7 @@ test('should get a single comment', async () => {
 //     })
 //     expect(blogs.statusCode).toBe(200)
 // });
+
 
 test('should delete a blogs', async ()=>{
     const blogs = await request(app).delete("/api/blogs/:id");
