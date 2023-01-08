@@ -1,6 +1,5 @@
 import joi from 'joi';
 
-
 const validator= (schema) => (payload) => schema.validate(payload, { abortEarly: false})
 
 

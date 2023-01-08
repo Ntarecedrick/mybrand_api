@@ -28,5 +28,4 @@ let postBlog = async (req, res) => {
         return res.status(400).send(err)
     }
 }
-
 export default postBlog

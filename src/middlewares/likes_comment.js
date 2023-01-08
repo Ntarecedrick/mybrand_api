@@ -21,7 +21,7 @@ const likes_Comments = async (req, res, next) => {
     }
   } catch (error) {
     res.status(500).json({ error: error });
-    console.log(error);
+    console.log("server not working");
   }
 };
 export default likes_Comments
