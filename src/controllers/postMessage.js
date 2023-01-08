@@ -2,6 +2,7 @@ import Message from "../models/Message";
 import validateMessage from "../validation/validateMessage";
 
 const postMessages=  async (req, res) => {
+  try {
     const { error, value } = validateMessage(req.body);
 
     if (error) {
@@ -15,6 +16,9 @@ const postMessages=  async (req, res) => {
         await message.save();
         return res.send(message).status(200)
     }
+  } catch (error) {
+    return res.send(error)
+  }
 
 }
 

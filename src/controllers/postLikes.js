@@ -2,6 +2,7 @@ import ValidateLikes from '../validation/likesValidation'
 import Blog from '../models/Blog'
 let postLikes = async (req, res) => {
 
+      try {
         const blog = await Blog.findOne({ _id: req.params.id });
 
         if (!blog.likes.user.includes(res.locals.email)) {
@@ -9,7 +10,7 @@ let postLikes = async (req, res) => {
             const newUser= blog.likes.user
             newUser.push(res.locals.email); 
 
-            await Blog.findOneAndUpdate({ _id: req.params.id }, {
+          await Blog.findOneAndUpdate({ _id: req.params.id }, {
                 likes: {
                     likesNumber: updateLikes,
                     user: newUser
@@ -28,7 +29,10 @@ let postLikes = async (req, res) => {
             })
         }
         const newBlog = await Blog.findOne({ _id: req.params.id });
-        res.send(newBlog)
+        return res.send(newBlog)
+      } catch (error) {
+        return res.send(error)
+      }
 }
 
 export default postLikes

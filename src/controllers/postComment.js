@@ -3,6 +3,7 @@ import Blog from '../models/Blog'
 
 
 let postComment= async (req, res) => {
+   try{
     const blog = await Blog.findOne({ _id: req.params.id })
     const { error, value } = validateComment(req.body)
 
@@ -18,6 +19,9 @@ let postComment= async (req, res) => {
         await blog.save();
         return res.send(blog)
     }
+   }catch(err){
+    return res.send(err)
+   }
 }
 
 export default postComment

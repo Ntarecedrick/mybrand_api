@@ -17,12 +17,13 @@ async function testpassport(){
                 secretOrKey: process.env.TOKEN_SECRET,
                 jwtFromRequest: extractJwt.fromAuthHeaderAsBearerToken()
             },
-            (jwtPayload, done) => {
-                return User.findOne({ _id: jwtPayload })
-                  .then((user) => {
+            async (jwtPayload, done) => {
+                try {
+                    const user = await User.findOne({ _id: jwtPayload });
                     return done(null, user);
-                  })
-                  .catch((err) => done(err));
+                } catch (err) {
+                    return done(err);
+                }
               }
         )
     )
