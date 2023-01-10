@@ -27,6 +27,7 @@ test('should get blog likes', async () => {
 });
 
 
+
 test('should get a single blog', async () => {
     const blog = await Blog.findOne();
 
@@ -64,6 +65,7 @@ test('should update a blog', async () => {
     })
     expect(blogs.statusCode).toBe(200)
 });
+
 
 test('should delete a blogs', async ()=>{
     const blog = await Blog.findOne();
