@@ -4,6 +4,7 @@ import validateUser from '../validation/validateUser';
 
 
 const registerUser=async (req,res)=>{
+   try {
     const {error,value}= validateUser(req.body);
 
     if(error) return res.status(400).send(error.details[0].message)
@@ -14,15 +15,16 @@ const registerUser=async (req,res)=>{
 
     const salt= await bcrypt.genSalt(10);
     const hashPassword= await bcrypt.hash(req.body.password, salt)
-
-
     const user= new User({
         name: req.body.name,
         email: req.body.email,
         password: hashPassword
     })
-    await user.save();
-    res.send(user)
+     await user.save();
+    return res.status(200).send(user)
+   } catch (error) {
+    return res.status(400).send(error)
+   }
 }
 
 export default registerUser

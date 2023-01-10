@@ -2,33 +2,47 @@ import ValidateLikes from '../validation/likesValidation'
 import Blog from '../models/Blog'
 let postLikes = async (req, res) => {
 
+    try {
         const blog = await Blog.findOne({ _id: req.params.id });
-
-        if (!blog.likes.user.includes(res.locals.email)) {
-            const updateLikes = blog.likes.likesNumber + 1;
-            const newUser= blog.likes.user
-            newUser.push(res.locals.email); 
-
+        let BooleanValue
+        let updatedLikes
+        if (!blog.likes.userValue) {
+             BooleanValue = true
+             updatedLikes = blog.likes.userLike + 1
             await Blog.findOneAndUpdate({ _id: req.params.id }, {
                 likes: {
-                    likesNumber: updateLikes,
-                    user: newUser
+                    userLike: updatedLikes,
+                    userValue: BooleanValue
                 }
             });
+
         } else {
-            const newLikes = blog.likes.likesNumber - 1;
-            const userFilter = blog.likes.user.filter((param) => {
-                return param !== res.locals.email
-            });
-            await Blog.findOneAndUpdate({ _id: req.params.id }, {
-                likes: {
-                    likesNumber: newLikes,
-                    user: userFilter
-                }
-            })
+            if (blog.likes.userLike <= 0) {
+                 BooleanValue = false
+                 updatedLikes = blog.likes.userLike - 1
+                await Blog.findOneAndUpdate({ _id: req.params.id }, {
+                    likes: {
+                        userLike: updatedLikes,
+                        userValue: BooleanValue
+                    }
+                });
+            } else {
+                 BooleanValue = false
+                 updatedLikes = blog.likes.userLike - 1
+                await Blog.findOneAndUpdate({ _id: req.params.id }, {
+                    likes: {
+                        userLike: updatedLikes,
+                        userValue: BooleanValue
+                    }
+                });
+            }
+
         }
         const newBlog = await Blog.findOne({ _id: req.params.id });
-        res.send(newBlog)
+        return res.status(200).send(newBlog.likes)
+    } catch (error) {
+        return res.status(400).send(error)
+    }
 }
 
 export default postLikes

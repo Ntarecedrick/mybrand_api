@@ -3,26 +3,26 @@ import express from 'express';
 import router from './routes/router';
 import authRoutes from './routes/auth';
 import "dotenv/config"
+import swaggerUI from "swagger-ui-express"
+import specs from './swagger';
+import cors from "cors"
 
 const app = express();
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 app.use(express.json({limit: '500mb'}));
+app.use(cors({ origin: "*" }))
 const Port= process.env.PORT || 4000
-
+const AuthToken=process.env.AUTH
 try {
     mongoose.set('strictQuery', false);
     mongoose.connect(process.env.URL, { useNewUrlParser: true }, ()=>{
-        console.log("mongoDB running")
+        console.log("database running")
     });
-
-    app.use("/api", router);
-    app.use('/user', authRoutes);
-    app.use((req, res) => res.status(400).json({
-        Error: 'Bad request',
-        }));
+    app.use("/", router)
+    app.use('/', authRoutes)
     app.listen(Port, () => {
-        console.log('server started');
-    })
-    
+        console.log('server started')
+    })    
 } catch (error) {
     console.log(error)
 }

@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config()
 
 const loginUser = async (req, res) => {
+   try {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) return res.status(400).send('invalid email or Password ');
@@ -12,13 +13,16 @@ const loginUser = async (req, res) => {
     if (!ValidPassword) return res.status(400).send('invalid email or Password');
 
 
-    const token = jwt.sign({ _id: user._id, name: user.name, email: user.email } , process.env.TOKEN_SECRET);
+    const token = jwt.sign({ _id: user._id, name: user.name, email: user.email } , process.env.TOKEN_SECRET) ;
     const UserObject = {
         userName: user.name,
         userEmail: user.email,
         userToken: token
     }
-    res.header('auth-token', token).send(UserObject)
+   return res.header('auth-token', token).send(UserObject)
+   } catch (error) {
+    return res.status(404).send(error)
+   }
 }
 
 export default loginUser

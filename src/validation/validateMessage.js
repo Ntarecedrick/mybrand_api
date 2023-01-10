@@ -6,7 +6,7 @@ const validator= (schema) => (payload) => schema.validate(payload, { abortEarly:
 const messageSchema = joi.object({
     name: joi.string().min(3).required().trim(),
     email: joi.string().email().required(), 
-    message: joi.string().min(3).max(100).required()
+    message: joi.string().min(10).max(200).required()
 })
 
 

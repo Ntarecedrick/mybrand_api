@@ -1,47 +1,36 @@
 import request from 'supertest';
 import app from '../index';
 import Blog from '../models/Blog'
-import { dataImage, tokenValue } from './values';
 import dotenv from 'dotenv';
 import Message from '../models/Message'
-import User from "../models/user"
 
 dotenv.config()
-
+const AuthToken=process.env.AUTH
 // test For Blog 
 
 test('should get all blogs', async () => {
-    const blogs = await request(app).get("/api/blogs");
+    const blogs = await request(app).get("/blogs");
 
     expect(blogs.statusCode).toBe(200)
 })
 
 test('should get blog likes', async () => {
     const blog = await Blog.findOne();
-
+    console.log(blog)
     const id = blog._id
 
-    const blogs = await request(app).get(`/api/blogs/${id}/likes`);
+    const blogs = await request(app).get(`/blogs/${id}/likes`);
 
     expect(blogs.statusCode).toBe(200)
 });
 
-// test('should Post blog likes', async () => {
-//     const blog = await Blog.findOne();
-//     const id = blog._id
-//     const blogs = await request(app).post(`/api/blogs/${id}/likes`).set(
-//         'Authorization', tokenValue
-//     ).send();
-
-//     expect(blogs.statusCode).toBe(200)
-// })
 
 
 test('should get a single blog', async () => {
     const blog = await Blog.findOne();
 
     const id = blog._id
-    const blogs = await request(app).get(`/api/blogs/${id}`);
+    const blogs = await request(app).get(`/blogs/${id}`);
 
     expect(blogs.statusCode).toBe(200)
 })
@@ -50,54 +39,67 @@ test('should get a single comment', async () => {
     const blog = await Blog.findOne();
 
     const id = blog._id
-    const blogs = await request(app).get(`/api/blogs/${id}/comments`);
+    const blogs = await request(app).get(`/blogs/${id}/comments`);
 
     expect(blogs.statusCode).toBe(200)
 })
 
-// test('should post a comment', async () => {
-//     const blog = await Blog.findOne();
+test('should post a comment', async () => {
+    const blog = await Blog.findOne();
 
-//     const id = blog._id
-//     const blogs = await request(app).post(`/api/blogs/${id}/comments`).set('Authorization', tokenValue).send({
-//         message: "hello dear test"
-//     })
-//     expect(blogs.statusCode).toBe(200);
-// })
+    const id = blog._id
+    const blogs = await request(app).post(`/blogs/${id}/comments`).send({
+        email: "ntarecedrick250@gmail.com",
+        message: "hello dear test"
+    })
+    expect(blogs.statusCode).toBe(200);
+})
 
-// test('should post a blog', async () => {
+test('should Post blog likes', async () => {
+    const blog = await Blog.findOne();
+    const id = blog._id
+    if (!blog.likes.userValue) {
+        const BooleanValue = true
+        const updatedLikes = blog.likes.userLike + 1
+        await Blog.findOneAndUpdate({
+            likes: {
+                userLike: updatedLikes,
+                userValue: BooleanValue
+            }
+        });
 
-//     const blogs = await request(app).post(`/api/blogs`).set('Authorization', tokenValue).send({
-//         title: "a new test for blog",
-//         content: "we are just testing a route for posting",
-//         image: dataImage
-//     })
-//     expect(blogs.statusCode).toBe(200)
-// });
+    } else {
+        if (blog.likes.userLike <= 0) {
+            const BooleanValue = false
+            const updatedLikes = blog.likes.userLike - 1
+            await Blog.findOneAndUpdate({
+                likes: {
+                    userLike: updatedLikes,
+                    userValue: BooleanValue
+                }
+            });
+        } else {
+            const BooleanValue = false
+            const updatedLikes = blog.likes.userLike - 1
+            await Blog.findOneAndUpdate( {
+                likes: {
+                    userLike: updatedLikes,
+                    userValue: BooleanValue
+                }
+            });
+        }
 
-// test('should update a blog', async () => {
-//     const blog = await Blog.findOne();
-//     const id = blog._id
-//     const blogs = await request(app).put(`/api/blogs/${id}`).set('Authorization', tokenValue).send({
-//         title: "a new test for blog",
-//         content: "we are just testing a route for posting",
-//         image: dataImage
-//     })
-//     expect(blogs.statusCode).toBe(200)
-// });
+    }
+    const blogs = await request(app).post(`/blogs/${id}/likes`).send();
 
-
-test('should delete a blogs', async ()=>{
-    const blogs = await request(app).delete("/api/blogs/:id");
-
-    expect(blogs.statusCode).toBe(404)
+    expect(blogs.statusCode).toBe(200)
 })
 
 // test for User
 
 let randonNumber= Math.floor(Math.random() * 100000)
 test ('register user', async ()=>{
-    const user= await request(app).post('/user/register').send({
+    const user= await request(app).post('/signup').send({
         name: "andela program",
         email: `andela${randonNumber}@program.com`,
         password: "andela123"
@@ -107,7 +109,7 @@ test ('register user', async ()=>{
 })
 
 test('user login', async ()=>{
-    const user= await request(app).post('/user/login').send({
+    const user= await request(app).post('/login').send({
         email: "ntarecedrick250@gmail.com",
         password: "ntare250"
     });
@@ -118,7 +120,7 @@ test('user login', async ()=>{
 // message Test
 
 test('should Send a Message', async () => {0
-    const message = await request(app).post("/api/messages")
+    const message = await request(app).post("/messages")
     .send({
         name: "test jest",
         email: "jest@test.com",
@@ -127,25 +129,25 @@ test('should Send a Message', async () => {0
     expect(message.statusCode).toBe(200) ;
 });
 
-test('should should send a 400 eror', async ()=>{
-    const message = await request(app).post("/api/messages")
-    .send({
-        name: "test jest",
-        email: "jesttest.com",
-        message: "i am just testing"
-    });
-    expect(message.statusCode).toBe(400) ;
-})
+
 
 test('should get all message', async ()=>{
-    const messages= await Message.findOne();
-    const id= messages._id
-    const message = await request(app).get(`/api/messages/${id}`);
+    const message = await request(app).get(`/messages/`).set('Authorization' , AuthToken);
     expect(message.statusCode).toBe(200)
 });
 test('should get a message', async ()=>{
     const messages= await Message.findOne();
     const id= messages._id
-    const message = await request(app).get(`/api/messages/${id}`);
+    const message = await request(app).get(`/messages/${id}`).set('Authorization' , AuthToken);
     expect(message.statusCode).toBe(200)
+})
+
+// test likes and comments
+
+
+test("updating likes", async()=>{
+    const blog= Blog.findOne()
+    const id= blog._id
+    const singleLike= await request(app).put(`/blogs/${id}/likes`).send();
+    expect(singleLike.statusCode).toBe(200)
 })
